@@ -1,12 +1,12 @@
 import os
 
 from dotenv import load_dotenv
+from vector_store import VectorStore
 
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-from vector_store import VectorStore
 
 template = """
  Answer the question as truthfully as possible using the provided context, and assume 

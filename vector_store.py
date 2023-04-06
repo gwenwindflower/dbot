@@ -26,12 +26,8 @@ class VectorStore:
             persist_directory=f"./{name}", embedding_function=embedder
         )
         if os.listdir(f"./{name}") == []:
-            print(f"🔮 Initialized new vector store {name}")
             self.add_docs(name, docs_loc, embedder)
-            print(f"✅ Added embeddings for all docs in {docs_loc} to vector store")
-        else:
-            print(f"🔮 Loaded existing vector store {name}")
-
+    
     def add_docs(self, name: str, docs_path: str, embedder: OpenAIEmbeddings):
         """Add all docs in a directory to the vector store."""
         for root, dir_names, file_names in os.walk(docs_path):
@@ -42,10 +38,6 @@ class VectorStore:
                     docs = markdown_splitter.create_documents(item_path)
                     for doc in docs:
                         self.database.add_documents([doc])
-                        print(
-                            f"🌱 Added {doc.metadata['source']}#{doc.metadata['slug']}"
-                        )
-            print(f"🕸️ Embeddings for docs in {root} directory added to vector store")
 
     def num_tokens_from_string(
         self, string: str, encoding_name: str = "cl100k_base"
