@@ -36,7 +36,7 @@ importlib-metadata==6.1.0
 iniconfig==2.0.0
 Jinja2==3.1.2
 joblib==1.2.0
-langchain>=0.0.130
+langchain==0.0.132
 lxml==4.9.2
 lz4==4.3.2
 Markdown==3.4.3
