@@ -1,3 +1,4 @@
+import hashlib
 import re
 
 import frontmatter
@@ -14,10 +15,7 @@ class MarkdownSplitter:
         with open(file_path, "r") as f:
             markdown = f.read()
             chunks = re.findall(
-                # Need to edit this regex to not catch comments in code blocks
-                # Need to deal with frontmatter somehow and title/h1 not being in text
-                # Need to use frontmatter slug if it exists
-                r"^#+\s+(.*?)\n(.*?)(?=\n#|\Z)",
+                r"^#{2,}\s+(.*?)\n(.*?)(?=\n#{2,}|\Z)",
                 markdown,
                 flags=re.DOTALL | re.MULTILINE,
             )
@@ -28,6 +26,7 @@ class MarkdownSplitter:
                             "title": chunk[0],
                             "content": chunk[1],
                             "slug": self.slugify(chunk[0]),
+                            "source": file_path,
                         }
                     )
         return sections
@@ -53,7 +52,12 @@ class MarkdownSplitter:
             .replace("`", "")
             .replace("“", "")
             .replace("”", "")
+            .replace("`", "")
         )
+
+    def create_md5_hash(self, string: str) -> str:
+        """Creates an md5 hash from a string."""
+        return hashlib.md5(string.encode()).hexdigest()
 
     def create_documents(self, file_path: str) -> list:
         """Creates a list of langchain documents from a markdown file."""
@@ -71,8 +75,9 @@ class MarkdownSplitter:
                 Document(
                     page_content=section["content"],
                     metadata={
-                        # TODO test that this works!
-                        # It probably needs to be joined to the root path
+                        "id": self.create_md5_hash(
+                            f"{file_path}{section['slug']}{section['content']}"
+                        ),
                         "source": file_path,
                         "slug": section["slug"],
                         "title": section["title"],
